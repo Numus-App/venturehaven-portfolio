@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 
 const Header = () => {
+  const menuItems = [
+    { title: 'Home', path: '/' },
+    { title: 'Services', path: '/about' },
+    { title: 'Portfolio', path: '/portfolio' },
+    { title: 'Contact', path: '/contact' },
+  ];
+
   return (
     <motion.header
       className="bg-green-900 text-white shadow-lg"
@@ -38,24 +45,15 @@ const Header = () => {
           </motion.span>
         </Link>
         <nav>
-          <motion.ul
-            className="flex space-x-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
-          >
-            {['Home', 'Services', 'Portfolio', 'Contact'].map((item) => (
-              <motion.li
-                key={item}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}>
+          <ul className="flex space-x-4">
+            {menuItems.map((item, index) => (
+              <motion.li key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link to={item.path}>
                   <Button
                     variant="ghost"
                     className="text-green-300 hover:text-green-100 relative overflow-hidden group rounded-full px-4 py-2"
                   >
-                    <span className="relative z-10">{item}</span>
+                    <span className="relative z-10">{item.title}</span>
                     <motion.div
                       className="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-100"
                       initial={{ scale: 0, borderRadius: '100%' }}
@@ -66,7 +64,7 @@ const Header = () => {
                 </Link>
               </motion.li>
             ))}
-          </motion.ul>
+          </ul>
         </nav>
       </div>
     </motion.header>

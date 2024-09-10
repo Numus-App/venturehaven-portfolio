@@ -1,26 +1,32 @@
 import React from 'react';
 import Header from '../components/Header';
-import Services from '../components/Services';
+import AboutUs from '../components/Services';
 import Footer from '../components/Footer';
+import AnimatedBackground from '../components/AnimatedBackground';
+import { motion } from 'framer-motion';
 
-const ServicesPage = () => {
+const AboutUsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
-      <main>
-        <div className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-center mb-8">Our Services</h1>
-            <p className="text-xl text-center mb-12 max-w-3xl mx-auto">
-              At Numus, we provide a comprehensive suite of technical services designed to empower startups and established companies alike. From our global tech stack to expert architecture consulting, we're here to drive your project's success at every stage of development.
-            </p>
-          </div>
-        </div>
-        <Services />
-      </main>
-      <Footer />
+    <div className="min-h-screen bg-black">
+      <AnimatedBackground>
+        <Header />
+        <main>
+          <motion.div
+            className="py-20 relative overflow-hidden"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="container mx-auto px-4 relative z-10">
+              {/* Content is now in the AboutUs component */}
+            </div>
+          </motion.div>
+          <AboutUs />
+        </main>
+        <Footer />
+      </AnimatedBackground>
     </div>
   );
 };
 
-export default ServicesPage;
+export default AboutUsPage;
