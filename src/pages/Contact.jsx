@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { motion } from 'framer-motion';
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Mail, Youtube, Upload } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import Modal from '../components/Modal';
 
 const socialIcons = [
   { Icon: Facebook, link: "https://facebook.com/numusio" },
@@ -55,8 +56,34 @@ const TextAreaField = ({ label, name, placeholder, rows = 4, required = true, va
   </motion.div>
 );
 
-const SocialIcons = ({ icons, position }) => (
-  <div className={`fixed ${position}-0 top-1/2 transform -translate-y-1/2 w-16 flex flex-col items-center space-y-4 z-50`}>
+const FileUploadField = ({ label, name, accept, multiple = false, onChange }) => (
+  <motion.div className="mb-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <Label htmlFor={name} className="block text-green-200 mb-2">{label}</Label>
+    <div className="relative">
+      <Input
+        type="file"
+        id={name}
+        name={name}
+        accept={accept}
+        multiple={multiple}
+        onChange={onChange}
+        className="hidden"
+      />
+      <Label htmlFor={name} className="cursor-pointer flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+        <Upload className="mr-2" size={20} />
+        Choose Files
+      </Label>
+    </div>
+  </motion.div>
+);
+
+const SocialIcons = ({ icons }) => (
+  <motion.div 
+    className="flex justify-center space-x-4 mt-8"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.2 }}
+  >
     {icons.map((item, index) => (
       <motion.a
         key={index}
@@ -64,31 +91,35 @@ const SocialIcons = ({ icons, position }) => (
         target="_blank"
         rel="noopener noreferrer"
         className="text-green-300 hover:text-green-100 transition-colors duration-300"
-        initial={{ opacity: 0, x: position === 'left' ? -50 : 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
         whileHover={{ scale: 1.2, rotate: 360 }}
+        transition={{ duration: 0.3 }}
       >
-        <item.Icon size={32} />
+        <item.Icon size={24} />
       </motion.a>
     ))}
-  </div>
+  </motion.div>
 );
 
 const ContactForm = ({ type, onSubmit }) => {
-  const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '', pitchDeck: '' });
+  const [files, setFiles] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    setFiles([...e.target.files]);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, files });
   };
 
   const isPartner = type === 'partner';
+
   return (
     <motion.form 
       className="space-y-4"
@@ -126,6 +157,31 @@ const ContactForm = ({ type, onSubmit }) => {
         value={formData.message}
         onChange={handleChange}
       />
+      <FileUploadField
+        label="Branding Kit (Logos and Banners)"
+        name="brandingKit"
+        accept=".png,.svg"
+        multiple={true}
+        onChange={handleFileChange}
+      />
+      {!isPartner && (
+        <>
+          <FormField
+            label="Pitch Deck Link"
+            name="pitchDeck"
+            placeholder="https://example.com/pitch-deck"
+            required={false}
+            value={formData.pitchDeck}
+            onChange={handleChange}
+          />
+          <FileUploadField
+            label="Or Upload Pitch Deck"
+            name="pitchDeckFile"
+            accept=".pdf,.pptx"
+            onChange={handleFileChange}
+          />
+        </>
+      )}
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
         <Button type="submit" className="w-full futuristic-button">
           {isPartner ? "Submit Proposal" : "Submit Project"}
@@ -137,14 +193,13 @@ const ContactForm = ({ type, onSubmit }) => {
 
 const ContactPage = () => {
   const { toast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState('');
 
   const handleSubmit = (formData) => {
     console.log('Form submitted:', formData);
-    toast({
-      title: "Form Submitted",
-      description: "Thank you for your submission. We'll get back to you soon!",
-      duration: 5000,
-    });
+    setModalContent("Thank you for your submission. We'll get back to you soon!");
+    setIsModalOpen(true);
   };
 
   return (
@@ -158,7 +213,7 @@ const ContactPage = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl font-bold text-center mb-8 text-green-100 neon-text">Contact Us</h1>
+            <h1 className="text-4xl font-bold text-center mb-8 text-green-100">Contact Us</h1>
             <Card className="max-w-2xl mx-auto futuristic-card">
               <CardContent className="p-6">
                 <Tabs defaultValue="partner" className="w-full">
@@ -175,12 +230,17 @@ const ContactPage = () => {
                 </Tabs>
               </CardContent>
             </Card>
+            <SocialIcons icons={socialIcons} />
           </motion.div>
         </main>
-        <SocialIcons icons={socialIcons.slice(0, 3)} position="left" />
-        <SocialIcons icons={socialIcons.slice(3)} position="right" />
         <Footer />
       </AnimatedBackground>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className="text-green-100 text-center">
+          <h2 className="text-2xl font-bold mb-4">Submission Received</h2>
+          <p>{modalContent}</p>
+        </div>
+      </Modal>
     </div>
   );
 };
