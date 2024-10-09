@@ -1,76 +1,152 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import MatrixTornado from './MatrixTornado';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
 import { navItems } from '../nav-items';
+import { motion } from 'framer-motion';
+import { Moon, Sun, Menu, X } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useToast } from "@/components/ui/use-toast";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const location = useLocation();
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const showComingSoonToast = () => {
+    toast({
+      title: "LaunchPad Coming Soon!",
+      description: "We're working hard to bring you our LaunchPad. Stay tuned for updates!",
+      duration: 3000,
+    });
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const headerClass = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    isScrolled ? 'bg-futuristic-900/80 backdrop-blur-md' : 'bg-transparent'
+  }`;
 
   return (
-    <motion.header
-      className="bg-green-900 text-white shadow-lg relative h-auto py-4 md:h-20"
-      initial={{ opacity: 0, y: -50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <MatrixTornado />
-      <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center relative z-20">
-        <div className="flex justify-between w-full md:w-auto items-center mb-4 md:mb-0">
-          <Link to="/" className="flex items-center space-x-2">
-            <motion.img
-              src="/logo.svg"
-              alt="Numus Logo"
-              className="w-10 h-10 md:w-12 md:h-12"
-              whileHover={{ scale: 1.1, rotate: 360 }}
-              whileTap={{ scale: 0.9 }}
-            />
-            <motion.span
-              className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-green-500"
-              animate={{
-                backgroundPosition: ["0%", "100%"],
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-            >
-              Numus
-            </motion.span>
-          </Link>
-          <Button variant="ghost" className="md:hidden" onClick={toggleMenu}>
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+    <header className={headerClass}>
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <Link to="/" className="flex items-center space-x-2">
+          <motion.img 
+            src="/logo.svg" 
+            alt="Numus Logo" 
+            className="w-8 h-8 md:w-10 md:h-10"
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+          />
+          <span className="text-xl md:text-2xl font-bold text-futuristic-300 font-serif">Numus</span>
+        </Link>
+      
+        <div className="hidden md:flex items-center space-x-4">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {navItems.map((item, index) => (
+                <NavigationMenuItem key={index}>
+                  <Link to={item.to}>
+                    <NavigationMenuLink className={`${navigationMenuTriggerStyle()} font-sans text-futuristic-100 hover:text-futuristic-300 ${
+                      location.pathname === item.to ? 'bg-futuristic-800' : ''
+                    }`}>
+                      {item.title}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          
+          <Button 
+            onClick={showComingSoonToast} 
+            className="neon-border text-futuristic-300 hover:bg-futuristic-800 hover:text-futuristic-100 font-sans"
+          >
+            LaunchPad (Coming Soon)
           </Button>
         </div>
-        <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-auto`}>
-          <ul className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
-            {navItems.map((item, index) => (
-              <motion.li key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link to={item.to} onClick={() => setIsMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    className="w-full md:w-auto text-green-300 hover:text-green-100 relative overflow-hidden group rounded-full px-4 py-2"
-                  >
-                    <span className="relative z-10">{item.title}</span>
-                    <motion.div
-                      className="absolute inset-0 bg-green-600 opacity-0 group-hover:opacity-100"
-                      initial={{ scale: 0, borderRadius: '100%' }}
-                      whileHover={{ scale: 1, borderRadius: '16px' }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Button>
-                </Link>
-              </motion.li>
-            ))}
-          </ul>
-        </nav>
+      
+        <div className="md:hidden flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
       </div>
-    </motion.header>
+      
+      {isMobileMenuOpen && (
+        <motion.div
+          className="md:hidden bg-futuristic-900 py-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          <nav className="flex flex-col space-y-4 px-4">
+            {navItems.map((item, index) => (
+              <Link
+                key={index}
+                to={item.to}
+                className={`text-futuristic-100 hover:text-futuristic-300 py-2 ${
+                  location.pathname === item.to ? 'bg-futuristic-800 px-4 rounded' : ''
+                }`}
+                onClick={toggleMobileMenu}
+              >
+                {item.title}
+              </Link>
+            ))}
+            <Button 
+              onClick={showComingSoonToast} 
+              className="w-full neon-border text-futuristic-300 hover:bg-futuristic-800 hover:text-futuristic-100 font-sans"
+            >
+              LaunchPad (Coming Soon)
+            </Button>
+          </nav>
+        </motion.div>
+      )}
+    </header>
   );
 };
 

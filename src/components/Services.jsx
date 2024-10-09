@@ -5,27 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { serviceCategories } from '@/data/serviceCategories';
 import ServiceCard from './ServiceCard';
-import Modal from './Modal';
-
-const ServiceDialog = ({ service, onClose }) => (
-  <div>
-    <h2 className="text-2xl font-bold text-green-300 mb-4 flex items-center">
-      {React.createElement(service.icon, { className: "w-8 h-8 mr-3 text-green-400" })}
-      {service.title}
-    </h2>
-    <ul className="space-y-4">
-      {service.services.map((item, index) => (
-        <li key={index} className="flex items-start">
-          <span className="w-2 h-2 bg-green-400 rounded-full mr-3 mt-2"></span>
-          <div>
-            <h3 className="font-semibold text-green-300">{item.title}</h3>
-            <p className="text-green-200">{item.description}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+import ServiceDialog from './ServiceDialog';
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -35,19 +15,30 @@ const Services = () => {
 
   const visibleServices = isMobile ? 1 : isTablet ? 2 : 3;
 
-  const nextSlide = () => {
-    setStartIndex((prevIndex) => (prevIndex + 1) % serviceCategories.length);
+  const prevSlide = () => {
+    setStartIndex((prevIndex) => 
+      prevIndex > 0 ? prevIndex - 1 : serviceCategories.length - visibleServices
+    );
   };
 
-  const prevSlide = () => {
-    setStartIndex((prevIndex) => (prevIndex - 1 + serviceCategories.length) % serviceCategories.length);
+  const nextSlide = () => {
+    setStartIndex((prevIndex) => 
+      prevIndex < serviceCategories.length - visibleServices ? prevIndex + 1 : 0
+    );
   };
+
+  const stats = [
+    { value: "150M+", label: "User Network" },
+    { value: "50+", label: "Blockchain Ecosystems" },
+    { value: "$300M+", label: "Portfolio Worth" },
+    { value: "50+", label: "dApps Aggregated" },
+  ];
 
   return (
-    <section className="py-16 bg-green-900 text-white overflow-hidden">
+    <section className="py-12 md:py-24 bg-futuristic-900 text-futuristic-100 overflow-hidden">
       <div className="container mx-auto px-4 relative">
         <motion.h2 
-          className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-4 text-green-300"
+          className="text-2xl md:text-4xl lg:text-5xl font-bold text-center mb-4 md:mb-8 text-futuristic-300"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -55,13 +46,29 @@ const Services = () => {
           Numus Venture Studio Services
         </motion.h2>
         <motion.p 
-          className="text-sm md:text-base lg:text-lg text-center mb-10 max-w-2xl mx-auto text-green-200"
+          className="text-sm md:text-lg lg:text-xl text-center mb-8 md:mb-16 max-w-3xl mx-auto text-futuristic-200"
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          Empowering VCs, investors, and hedge funds with a full-cycle venture ecosystem. We accelerate growth, incubate innovation, and refine portfolios across the Web3 landscape.
+          Numus is a full-cycle venture capital and project incubation platform, integrating advanced aggregation technology and cross-chain capabilities to support and enhance blockchain-based projects. From incubation to scaling, we provide critical resources, technical infrastructure, and traffic activation to drive project success.
         </motion.p>
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8 mb-12 md:mb-16">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              className="text-center p-2 md:p-4 bg-futuristic-800 rounded-lg shadow-md"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <div className="text-xl md:text-3xl font-bold text-futuristic-300 mb-1 md:mb-2">{stat.value}</div>
+              <div className="text-xs md:text-sm text-futuristic-200">{stat.label}</div>
+            </motion.div>
+          ))}
+        </div>
+
         <div className="relative">
           <motion.div
             className="flex flex-col md:flex-row transition-all duration-500 ease-in-out"
@@ -70,7 +77,7 @@ const Services = () => {
             {serviceCategories.map((category, index) => (
               <motion.div
                 key={index}
-                className={`w-full md:w-1/2 lg:w-1/3 flex-shrink-0 p-4 ${isMobile ? 'mb-6' : ''}`}
+                className={`w-full md:w-1/2 lg:w-1/3 flex-shrink-0 p-2 md:p-5 ${isMobile ? 'mb-6' : ''}`}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -82,24 +89,38 @@ const Services = () => {
           {!isMobile && (
             <>
               <Button 
-                className="absolute top-1/2 -left-4 md:left-4 transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white rounded-full p-2 md:p-3" 
+                className="absolute top-1/2 -left-4 md:left-2 transform -translate-y-1/2 bg-futuristic-600 hover:bg-futuristic-700 text-futuristic-100 rounded-full p-2 md:p-3" 
                 onClick={prevSlide}
               >
-                <ChevronLeft className="h-4 w-4 md:h-6 md:w-6" />
+                <ChevronLeft className="h-5 w-5 md:h-7 md:w-7" />
               </Button>
               <Button 
-                className="absolute top-1/2 -right-4 md:right-4 transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white rounded-full p-2 md:p-3" 
+                className="absolute top-1/2 -right-4 md:right-2 transform -translate-y-1/2 bg-futuristic-600 hover:bg-futuristic-700 text-futuristic-100 rounded-full p-2 md:p-3" 
                 onClick={nextSlide}
               >
-                <ChevronRight className="h-4 w-4 md:h-6 md:w-6" />
+                <ChevronRight className="h-5 w-5 md:h-7 md:w-7" />
               </Button>
             </>
           )}
         </div>
+        {isMobile && (
+          <div className="flex justify-center mt-6 space-x-4">
+            <Button 
+              className="bg-futuristic-600 hover:bg-futuristic-700 text-futuristic-100 rounded-full p-2" 
+              onClick={prevSlide}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button 
+              className="bg-futuristic-600 hover:bg-futuristic-700 text-futuristic-100 rounded-full p-2" 
+              onClick={nextSlide}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
       </div>
-      <Modal isOpen={!!selectedService} onClose={() => setSelectedService(null)}>
-        {selectedService && <ServiceDialog service={selectedService} onClose={() => setSelectedService(null)} />}
-      </Modal>
+      <ServiceDialog isOpen={!!selectedService} onClose={() => setSelectedService(null)} service={selectedService} />
     </section>
   );
 };
