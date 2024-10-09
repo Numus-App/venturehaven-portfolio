@@ -1,10 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import AnimatedBackground from '../components/AnimatedBackground';
+import Layout from '../components/Layout';
 import { Card, CardContent } from "@/components/ui/card";
-import { Rocket, Briefcase, TrendingUp, Shield, Zap, DollarSign } from 'lucide-react';
+import { Rocket, Briefcase, TrendingUp, Shield, Zap, DollarSign, Users, Globe } from 'lucide-react';
 
 const AboutUs = () => {
   const services = [
@@ -16,52 +14,57 @@ const AboutUs = () => {
     { icon: DollarSign, title: "Investment Opportunities", description: "Curated access to high-potential blockchain projects and strategic co-investments." },
   ];
 
+  const stats = [
+    { icon: Users, value: "150M+", label: "User Network" },
+    { icon: Globe, value: "50+", label: "Blockchain Ecosystems" },
+    { icon: Briefcase, value: "$300M+", label: "Portfolio Worth" },
+    { icon: Rocket, value: "50+", label: "dApps Aggregated" },
+  ];
+
   return (
-    <div className="min-h-screen bg-green-900">
-      <AnimatedBackground>
-        <Header />
-        <main className="py-16">
-          <div className="container mx-auto px-4">
-            <motion.h1
-              className="text-4xl font-bold text-center mb-8 title-text"
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              About Numus Venture Studio
-            </motion.h1>
-            <motion.p
-              className="text-xl text-center mb-12 max-w-3xl mx-auto text-green-200"
+    <Layout
+      title="About Numus Venture Studio"
+      description="Accelerating growth, incubating innovation, and refining portfolios across the Web3 landscape"
+    >
+      <div className="container mx-auto px-4 py-8 md:py-16">
+        <motion.div
+          className="grid grid-cols-2 gap-4 mb-8 md:mb-16 mt-[10%] sm:mt-0"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          {stats.map((stat, index) => (
+            <Card key={index} className="bg-futuristic-800 border-futuristic-600">
+              <CardContent className="p-3 md:p-6 flex flex-col items-center">
+                <stat.icon className="w-6 h-6 md:w-12 md:h-12 text-futuristic-400 mb-1 md:mb-4" />
+                <span className="text-lg md:text-3xl font-bold text-futuristic-300">{stat.value}</span>
+                <span className="text-xs md:text-sm text-futuristic-200 text-center">{stat.label}</span>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-futuristic-300">Our Services</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              Numus positions itself as an outsourced action arm for VCs, investors, hedge funds, and product owners in the blockchain space. We provide comprehensive solutions to accelerate growth, incubate innovation, and refine portfolios across the Web3 landscape.
-            </motion.p>
-            <h2 className="text-3xl font-bold text-center mb-8 title-text">Our Services</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <Card className="bg-green-800 border-green-600 h-full">
-                    <CardContent className="p-6 flex flex-col items-center">
-                      <service.icon className="w-12 h-12 text-green-400 mb-4" />
-                      <h3 className="text-xl font-bold mb-2 text-green-300">{service.title}</h3>
-                      <p className="text-green-100 text-center">{service.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </AnimatedBackground>
-    </div>
+              <Card className="bg-futuristic-800 border-futuristic-600 h-full hover:shadow-lg hover:shadow-futuristic-500/20 transition-all duration-300">
+                <CardContent className="p-4 md:p-6 flex flex-col items-center">
+                  <service.icon className="w-8 h-8 md:w-12 md:h-12 text-futuristic-400 mb-2 md:mb-4" />
+                  <h3 className="text-lg md:text-xl font-bold mb-2 text-futuristic-300 text-center">{service.title}</h3>
+                  <p className="text-sm md:text-base text-futuristic-100 text-center">{service.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </Layout>
   );
 };
 
